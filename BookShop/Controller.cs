@@ -43,7 +43,7 @@ namespace edu.ksu.cis.masaaki
 
         }
 
-        public void LoginCustomer(string username, string pw)
+        public bool LoginCustomer(string username, string pw)
         {
             //Handled in CustomerWindow for now
 
@@ -59,7 +59,7 @@ namespace edu.ksu.cis.masaaki
                 {
                     loginSuccess = true;
                     _currentCustomer = c;
-                    return;
+                    return true;
                 }
                 //if(c.LoginOK(username, pw))
                 //{
@@ -69,7 +69,9 @@ namespace edu.ksu.cis.masaaki
             }
 
             if (!loginSuccess)
-                throw new BookShopException("User not found.");      
+                throw new BookShopException("User not found.");
+
+            return false;      
         }
         
         // ZTM: Possibly just access directly through the CustomerWindow class instead of passing through like this...
@@ -79,18 +81,19 @@ namespace edu.ksu.cis.masaaki
         }
         
 
-        public void AddBookToWishList(string isbn)
+        public void AddBookToWishListByISBN(string isbn)
         {
             foreach (Book b in _books)
             {
                 if (b.ISBNMatch(isbn))
                 {
                     _currentCustomer.AddToWishList(b);
+                    break;
                 }
             }
         }
 
-        public void AddBookToCart(string isbn)
+        public void AddBookToCartByISBN(string isbn)
         {
             foreach (Book b in _books)
             {
@@ -114,6 +117,11 @@ namespace edu.ksu.cis.masaaki
                 _pendingOrders.RemoveAt(index);
             }
             else throw new BookShopException("Index is outside range of pending transactions.");
+        }
+
+        public void LogOutCustomer()
+        {
+            _currentCustomer = null;
         }
 
     }

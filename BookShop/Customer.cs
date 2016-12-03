@@ -19,7 +19,9 @@ namespace edu.ksu.cis.masaaki
 
         private Transaction _cart;
         private List<Transaction> _orderHistory;
-        private List<Book> _wishList;
+        public List<Transaction> OrderHistory { get { return _orderHistory; } }
+        private List<WishListItem> _wishList;
+        public List<WishListItem> WishList { get { return WishList; } }
 
         public Customer(string fn, string ln, string un, string pw, string email, string add, string tn)
         {
@@ -32,7 +34,7 @@ namespace edu.ksu.cis.masaaki
             _teleNum = tn;
 
             _orderHistory = new List<Transaction>();
-            _wishList = new List<Book>();
+            _wishList = new List<WishListItem>();
             _cart = new Transaction(this, new List<OrderItem>());
         }
 
@@ -77,18 +79,19 @@ namespace edu.ksu.cis.masaaki
             {
                 _cart.AddBook(b);
             }
+            else throw new BookShopException("There is no stock left for the selected book.");
         }
 
         public void AddToWishList(Book bookToAdd)
         {
-            foreach (Book b in _wishList)
+            foreach (WishListItem wli in _wishList)
             {
-                if (bookToAdd == b)
+                if (bookToAdd == wli.AttachedBook)
                 {
                     throw new BookShopException("Book is already on your wishlist.");
                 }
             }
-            _wishList.Add(bookToAdd);
+            _wishList.Add(new WishListItem(bookToAdd));
         }
 
         public Transaction CheckOut()
@@ -97,6 +100,22 @@ namespace edu.ksu.cis.masaaki
             _orderHistory.Add(_cart);
             _cart = new Transaction(this, new List<OrderItem>());
             return toReturn;
+        }
+
+        public void AddToCartFromWishList(WishListItem wli)
+        {
+            AddBookToCart(wli.AttachedBook);
+        }
+
+        public void RemoveFromWishList(int i)
+        {
+            if (i >= 0 && i < _wishList.Count())
+                _wishList.RemoveAt(i);
+        }
+
+        public override string ToString()
+        {
+            return _lastName + " " + _firstName + " " + _userName + " " + _email + " " + _address + " " + _teleNum;
         }
     }
 }

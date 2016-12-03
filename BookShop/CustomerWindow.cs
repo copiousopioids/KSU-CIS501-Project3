@@ -74,7 +74,10 @@ namespace edu.ksu.cis.masaaki
                         return;
                     // XXX Login button is pressed
                     case DialogReturn.Login:
-                        _attachedControl.LoginCustomer(loginDialog.UserName, loginDialog.Password);
+                        if (_attachedControl.LoginCustomer(loginDialog.UserName, loginDialog.Password))
+                        {
+                            this.lbLoggedinCustomer.Text = ("Loggedin Customer: " + _attachedControl.CurrentCustomer.UserName);
+                        }
                         break;
                     default:
                         return;
@@ -174,17 +177,18 @@ namespace edu.ksu.cis.masaaki
                     listBooksDialog.AddDisplayItems(_attachedControl.BookList.ToArray()); // XXX null is a dummy argument
                     if (listBooksDialog.Display() == DialogReturn.Done) return;
                     // select is pressed
-
+                    Book selectedBook = (Book)listBooksDialog.SelectedItem;
+                    PopulateBookDialog(selectedBook, bookInformationDialog);
                     switch (bookInformationDialog.Display())
                     {
                         case DialogReturn.AddToCart: // Add to Cart
                                                      // XXX
-                            _attachedControl.CurrentCustomer.AddBookToCart((Book)listBooksDialog.SelectedItem);
+                            _attachedControl.CurrentCustomer.AddBookToCart(selectedBook);
                             continue;
 
                         case DialogReturn.AddToWishList: // Add to Wishlist
                             // XXX
-                            _attachedControl.CurrentCustomer.AddToWishList((Book)listBooksDialog.SelectedItem);
+                            _attachedControl.CurrentCustomer.AddToWishList(selectedBook);
                             continue;
 
                         case DialogReturn.Done: // cancel
@@ -214,20 +218,22 @@ namespace edu.ksu.cis.masaaki
                     }
 
                     wishListDialog.ClearDisplayItems();
-                    wishListDialog.AddDisplayItems(null);  // XXX null is a dummy argument
+                    wishListDialog.AddDisplayItems(_attachedControl.CurrentCustomer.WishList.ToArray());  // XXX null is a dummy argument
                     if (wishListDialog.Display() == DialogReturn.Done) return;
-                    // select is pressed
-
+                    //// select is pressed
+                    WishListItem selectedWishListItem = (WishListItem)wishListDialog.SelectedItem;
+                    PopulateBookDialog(selectedWishListItem.AttachedBook, bookInWishListDialog);
                     //XXX 
                     switch (bookInWishListDialog.Display())
                     {
                         case DialogReturn.AddToCart:
                             // XXX 
-                            
+                            _attachedControl.CurrentCustomer.AddToCartFromWishList(selectedWishListItem);
 
                             continue;
                         case DialogReturn.Remove:
                             // XXX
+                            _attachedControl.CurrentCustomer.RemoveFromWishList(listBooksDialog.SelectedIndex);
 
                             continue;
                         case DialogReturn.Done: // Done
@@ -307,7 +313,18 @@ namespace edu.ksu.cis.masaaki
         private void bnLogout_Click(object sender, EventArgs e)
         {
             // XXX Logout  button event handler
-         
+            _attachedControl.LogOutCustomer();
+        }
+
+        private void PopulateBookDialog(Book b, BookDialog bd)
+        {
+            bd.BookTitle = b.Title;
+            bd.Author = b.Author;
+            bd.Publisher = b.Publisher;
+            bd.ISBN = b.ISBN;
+            bd.Date = b.Date;
+            bd.Price = b.Price;
+            bd.Stock = b.Stock;
         }
     }
 }

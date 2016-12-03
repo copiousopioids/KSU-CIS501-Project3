@@ -70,6 +70,7 @@
       <DependentUpon>StaffWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="Transaction.cs" />
+    <Compile Include="WishListItem.cs" />
     <EmbeddedResource Include="BookShop.resx">
       <DependentUpon>BookShop.cs</DependentUpon>
     </EmbeddedResource>

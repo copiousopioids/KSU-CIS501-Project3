@@ -114,12 +114,12 @@ namespace edu.ksu.cis.masaaki
                                     break;
                                 case "AddBookToWishList":
                                     // XXX use words[1] (ISBN) to register the book in the current customer's wishlist
-                                    _control.AddBookToWishList(words[1]);
+                                    _control.AddBookToWishListByISBN(words[1]);
 
                                     break;
                                 case "AddBookToCart":
                                     // XXX use words[1] (ISBN) to add the book in the current customer's cart
-                                    _control.AddBookToCart(words[1]);
+                                    _control.AddBookToCartByISBN(words[1]);
 
                                     break;
                                 case "CheckOut":

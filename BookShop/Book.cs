@@ -9,13 +9,19 @@ namespace edu.ksu.cis.masaaki
     public class Book
     {
         private string _isbn;
+        public string ISBN { get { return _isbn; } }
         private string _title;
         public string Title { get { return _title; } }
         private string _author;
+        public string Author { get { return _author; } }
         private int _stock;
+        public int Stock { get { return _stock; } }
         private string _publisher;
+        public string Publisher { get { return _publisher; } }
         private decimal _price;
+        public decimal Price { get { return _price; } }
         private string _date;
+        public string Date { get { return _date; } }
 
 
         public Book(string title, string author, string publisher, string isbn, string date, decimal price, int stock)
@@ -35,14 +41,9 @@ namespace edu.ksu.cis.masaaki
             return (_title + "  " + _author + "  " + _publisher + "  " + _isbn + "  " + _price.ToString("F") + "  " + _stock);
         }
 
-        public string ToWishlistString()
-        {
-            return (_title + " BY " + _author);
-        }
-
         public string ToCartString()
         {
-            return (ToWishlistString() + " : " + _stock + "      " + _price.ToString("C"));
+            return (_title + " BY " + _author + " : " + _stock + "      " + _price.ToString("C"));
         }
 
         public bool TryGetBook()
