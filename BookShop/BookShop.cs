@@ -16,6 +16,7 @@ namespace edu.ksu.cis.masaaki
     {
         StaffWindow staffWindow;
         CustomerWindow customerWindow;
+        Controller _control = new Controller();
         // XXX You can add more fields
        
         public BookShop()
@@ -24,12 +25,14 @@ namespace edu.ksu.cis.masaaki
         }
         private void BookShop_Load(object sender, EventArgs e)
         {
+            
+
             // XXX You may change the contructors of StaffWindow and CustomerWindow to take
             // some arguments
-            staffWindow = new StaffWindow();
+            staffWindow = new StaffWindow(_control);
             staffWindow.StartPosition = FormStartPosition.Manual;
             staffWindow.Location = new Point(600, 100);
-            customerWindow = new CustomerWindow();
+            customerWindow = new CustomerWindow(_control);
             customerWindow.StartPosition = FormStartPosition.Manual;
             customerWindow.Location = new Point(100, 100);    
         }
@@ -96,32 +99,37 @@ namespace edu.ksu.cis.masaaki
                                     decimal price = getDecimal(words[5]);
                                     int stock = getInt(words[7]);
                                     // XXX use words[1]~words[4], price, words[6], and stock to register a book
+                                    _control.BookList.Add(new Book(words[1], words[2], words[3], words[4], words[6], price, stock));
 
                                     break;
                                 case "AddCustomer":
                                     // XXX use words[1]~words[7] to register a customer
+                                    _control.CustomerList.Add(new Customer(words[2], words[1], words[3], words[4], words[5], words[6], words[7]));
 
                                     break;
                                 case "Login":
                                     // XXX use words[1] and words[2] to login a customer
+                                    _control.LoginCustomer(words[1], words[2]);
 
                                     break;
                                 case "AddBookToWishList":
                                     // XXX use words[1] (ISBN) to register the book in the current customer's wishlist
+                                    _control.AddBookToWishList(words[1]);
 
                                     break;
                                 case "AddBookToCart":
                                     // XXX use words[1] (ISBN) to add the book in the current customer's cart
+                                    _control.AddBookToCart(words[1]);
 
                                     break;
                                 case "CheckOut":
                                     // XXX check out the current customer's cart
-
+                                    _control.CheckOutCurrentCustomer();
                                     break;
                                 case "ProcessPendingTransaction":
                                     // XXX use words[1] (index of the pending transactions) to identify the pending
                                     // transaction to approve
-
+                                    _control.ProcessPendingTransaction(Convert.ToInt32(words[1]));
                                     break;
                                 default:
                                     MessageBox.Show(this, "Unknown Operation : " + words[0]);

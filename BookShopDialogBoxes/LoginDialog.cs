@@ -53,5 +53,9 @@ namespace edu.ksu.cis.masaaki
             }
         }
 
+        private void tbUserName_TextChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

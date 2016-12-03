@@ -23,6 +23,8 @@ namespace edu.ksu.cis.masaaki
         ListPendingTransactionsDialog listPendingTransactionsDialog;
         ShowPendingTransactionDialog showPendingTransactionDialog;
 
+        Controller _attachedControl;
+
         public StaffWindow()
         {
             InitializeComponent();
@@ -32,6 +34,12 @@ namespace edu.ksu.cis.masaaki
         // If you do so, make sure to call :this()
         // public StaffWindow(XXX xxx): this() { }
         // Without :this(), InitializeComponent() is not called
+
+        public StaffWindow(Controller ac) : this()
+        {
+            _attachedControl = ac;
+        }
+
         private void StaffWindow_Load(object sender, EventArgs e)
         {
             listCustomersDialog = new ListCustomersDialog();
@@ -54,7 +62,7 @@ namespace edu.ksu.cis.masaaki
                 try
                 { // to capture an exception from SelectedIndex/SelectedItem of listCustomersDialog
                     listCustomersDialog.ClearDisplayItems();
-                    listCustomersDialog.AddDisplayItems(null); // null is a dummy argument
+                    listCustomersDialog.AddDisplayItems(_attachedControl.CustomerList.ToArray()); // null is a dummy argument
                     if (listCustomersDialog.Display() == DialogReturn.Done) return;
                     // select button is pressed
                    
@@ -103,7 +111,7 @@ namespace edu.ksu.cis.masaaki
                 try
                 {   // to capture an exception from SelectedItem/SelectedIndex of listBooksDialog
                     listBooksDialog.ClearDisplayItems();
-                    listBooksDialog.AddDisplayItems(null); //null is a dummy argument
+                    listBooksDialog.AddDisplayItems(_attachedControl.BookList.ToArray()); //null is a dummy argument
                     if (listBooksDialog.Display() == DialogReturn.Done) return;
                     // select is pressed
 
