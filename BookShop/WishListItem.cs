@@ -18,7 +18,7 @@ namespace edu.ksu.cis.masaaki
 
         public override string ToString()
         {
-            return AttachedBook.Title + " BY " + AttachedBook.Author;
+            return AttachedBook.ToWishListString();
         }
     }
 }

@@ -10,6 +10,7 @@ namespace edu.ksu.cis.masaaki
     {
         private Customer _attachedCust;
         private List<OrderItem> _bookList;
+        public List<OrderItem> BookList { get { return _bookList; } }
 
         
         public Transaction(Customer attachedCust, List<OrderItem> bookList)
@@ -24,7 +25,7 @@ namespace edu.ksu.cis.masaaki
 
             foreach (OrderItem oi in _bookList)
             {
-                sb.Append(oi.ToString());
+                sb.Append(oi.ToTransactionString());
                 sb.Append(",   ");
             }
 
@@ -42,6 +43,28 @@ namespace edu.ksu.cis.masaaki
                 
             }
             _bookList.Add(new OrderItem(1, b));
+        }
+
+        public void ReturnBook(OrderItem oi)
+        {
+            if (oi.ReturnBook() == false)
+            {
+                _bookList.Remove(oi);
+            }
+        }
+
+        public string[] CartTotalArray()
+        {
+            string[] toReturn = new string[2];
+            decimal totalPrice = 0;
+            foreach (OrderItem oi in _bookList)
+            {
+                totalPrice += oi.GetCost();
+            }
+            toReturn[0] = "====================================";
+            toReturn[1] = "Total Price: " + totalPrice.ToString("C");
+
+            return toReturn;
         }
     }
 }

@@ -27,6 +27,13 @@ namespace edu.ksu.cis.masaaki
             _completeOrders = new List<Transaction>();
         }
 
+        public bool IsLoggedIn()
+        {
+            if (_currentCustomer != null)
+                return true;
+            else return false;
+        }
+
 
         public void RegisterCustomer(string fn, string ln, string un, string pw, string email, string add, string tn)
         {
@@ -124,5 +131,34 @@ namespace edu.ksu.cis.masaaki
             _currentCustomer = null;
         }
 
+        public void PopulateBookDialog(Book b, BookDialog bd)
+        {
+            bd.BookTitle = b.Title;
+            bd.Author = b.Author;
+            bd.Publisher = b.Publisher;
+            bd.ISBN = b.ISBN;   
+            bd.Date = b.Date;
+            bd.Price = b.Price;
+            bd.Stock = b.Stock;
+        }
+
+        public void AddToPendingTransactions(Transaction t)
+        {
+            _pendingOrders.Add(t);
+        }
+
+        public void CompleteTransactionAt(int index)
+        {
+            if (index >= 0 && index < _pendingOrders.Count())
+            {
+                _completeOrders.Add(_pendingOrders.ElementAt(index));
+                _pendingOrders.RemoveAt(index);
+            }
+        }
+        
+        public void ReturnBook(OrderItem oi)
+        {
+            _currentCustomer.ReturnFromCart(oi);
+        }        
     }
 }

@@ -75,9 +75,7 @@ namespace edu.ksu.cis.masaaki
                     // XXX Login button is pressed
                     case DialogReturn.Login:
                         if (_attachedControl.LoginCustomer(loginDialog.UserName, loginDialog.Password))
-                        {
-                            this.lbLoggedinCustomer.Text = ("Loggedin Customer: " + _attachedControl.CurrentCustomer.UserName);
-                        }
+                            UpdateCustomerText();
                         break;
                     default:
                         return;
@@ -137,7 +135,7 @@ namespace edu.ksu.cis.masaaki
         {
             // XXX Edit Self Info button event handler
             try {
-                if (_attachedControl.CurrentCustomer != null)
+                if (_attachedControl.IsLoggedIn())
                 {
                     switch (customerDialog.Display())
                     {
@@ -178,7 +176,7 @@ namespace edu.ksu.cis.masaaki
                     if (listBooksDialog.Display() == DialogReturn.Done) return;
                     // select is pressed
                     Book selectedBook = (Book)listBooksDialog.SelectedItem;
-                    PopulateBookDialog(selectedBook, bookInformationDialog);
+                    _attachedControl.PopulateBookDialog(selectedBook, bookInformationDialog);
                     switch (bookInformationDialog.Display())
                     {
                         case DialogReturn.AddToCart: // Add to Cart
@@ -212,7 +210,7 @@ namespace edu.ksu.cis.masaaki
             {
                 try
                 { // to capture an excepton by SelectedItem/SelectedIndex of wishListDialog
-                    if (_attachedControl.CurrentCustomer == null)
+                    if (!_attachedControl.IsLoggedIn())
                     {
                         throw new BookShopException("Customer not logged in.");
                     }
@@ -222,7 +220,7 @@ namespace edu.ksu.cis.masaaki
                     if (wishListDialog.Display() == DialogReturn.Done) return;
                     //// select is pressed
                     WishListItem selectedWishListItem = (WishListItem)wishListDialog.SelectedItem;
-                    PopulateBookDialog(selectedWishListItem.AttachedBook, bookInWishListDialog);
+                    _attachedControl.PopulateBookDialog(selectedWishListItem.AttachedBook, bookInWishListDialog);
                     //XXX 
                     switch (bookInWishListDialog.Display())
                     {
@@ -233,7 +231,7 @@ namespace edu.ksu.cis.masaaki
                             continue;
                         case DialogReturn.Remove:
                             // XXX
-                            _attachedControl.CurrentCustomer.RemoveFromWishList(listBooksDialog.SelectedIndex);
+                            _attachedControl.CurrentCustomer.RemoveFromWishList(selectedWishListItem);
 
                             continue;
                         case DialogReturn.Done: // Done
@@ -256,17 +254,34 @@ namespace edu.ksu.cis.masaaki
                 try
                 {  // to capture an exception from SelectedIndex/SelectedItem of carDisplay
                     cartDialog.ClearDisplayItems();
-                    cartDialog.AddDisplayItems(null); // null is a dummy argument
+                    cartDialog.AddDisplayItems(_attachedControl.CurrentCustomer.Cart.BookList.ToArray()); // null is a dummy argument
+                    cartDialog.AddDisplayItems(_attachedControl.CurrentCustomer.Cart.CartTotalArray());
+
+                    //foreach (OrderItem oi in _attachedControl.CurrentCustomer.Cart.BookList)
+                    //{
+                    //    if (oi == selectedObject)
+                    //    {
+                    //        targetObject = oi;
+                    //    }
+                    //}
+
                     switch (cartDialog.Display())
                     {
                         case DialogReturn.CheckOut:  // check out
                             // XXX
-
+                            _attachedControl.CheckOutCurrentCustomer();
                             return;
                         case DialogReturn.ReturnBook: // remove a book
-                               // XXX
-
+                            // XXX
+                            object selectedObject = cartDialog.SelectedItem;  // picked up a string or an OrderItem object
+                            if (!(selectedObject is OrderItem))
+                            {
+                                MessageBox.Show(this, "an extra line was selected");
                                 continue;
+                            }
+                            OrderItem targetObject = (OrderItem)selectedObject;
+                            _attachedControl.ReturnBook(targetObject);
+                            continue;
                         
                         case DialogReturn.Done: // cancel
                             return;
@@ -288,14 +303,14 @@ namespace edu.ksu.cis.masaaki
                 
                 try
                 {  // to capture an exception from SelectedIndex/SelectedItem of listTransactionHistoryDialog
-                    if (_attachedControl.CurrentCustomer != null)
+                    if (_attachedControl.IsLoggedIn())
                     {
 
                         listTransactionHistoryDialog.ClearDisplayItems();
-                        listTransactionHistoryDialog.AddDisplayItems(null); // null is a dummy argument
+                        listTransactionHistoryDialog.AddDisplayItems(_attachedControl.CurrentCustomer.OrderHistory.ToArray()); // null is a dummy argument
                         if (listTransactionHistoryDialog.Display() == DialogReturn.Done) return;
                         // Select is pressed
-
+                        Transaction selectedTransaction = 
 
                         showTransactionDialog.ClearDisplayItems();
                         showTransactionDialog.AddDisplayItems(null); // null is a dummy argument
@@ -316,15 +331,14 @@ namespace edu.ksu.cis.masaaki
             _attachedControl.LogOutCustomer();
         }
 
-        private void PopulateBookDialog(Book b, BookDialog bd)
+        public void UpdateCustomerText()
         {
-            bd.BookTitle = b.Title;
-            bd.Author = b.Author;
-            bd.Publisher = b.Publisher;
-            bd.ISBN = b.ISBN;
-            bd.Date = b.Date;
-            bd.Price = b.Price;
-            bd.Stock = b.Stock;
+            if (_attachedControl.IsLoggedIn())
+                lbLoggedinCustomer.Text = ("Loggedin Customer: " + _attachedControl.CurrentCustomer.UserName);
+            else
+                lbLoggedinCustomer.Text = ("Loggedin Customer: (none)");
         }
+
+
     }
 }

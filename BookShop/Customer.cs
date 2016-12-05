@@ -18,10 +18,11 @@ namespace edu.ksu.cis.masaaki
         private string _teleNum;
 
         private Transaction _cart;
+        public Transaction Cart { get { return _cart; } }
         private List<Transaction> _orderHistory;
         public List<Transaction> OrderHistory { get { return _orderHistory; } }
         private List<WishListItem> _wishList;
-        public List<WishListItem> WishList { get { return WishList; } }
+        public List<WishListItem> WishList { get { return _wishList; } }
 
         public Customer(string fn, string ln, string un, string pw, string email, string add, string tn)
         {
@@ -107,10 +108,14 @@ namespace edu.ksu.cis.masaaki
             AddBookToCart(wli.AttachedBook);
         }
 
-        public void RemoveFromWishList(int i)
+        public void RemoveFromWishList(WishListItem wli)
         {
-            if (i >= 0 && i < _wishList.Count())
-                _wishList.RemoveAt(i);
+                _wishList.Remove(wli);
+        }
+
+        public void ReturnFromCart(OrderItem oi)
+        {
+            _cart.ReturnBook(oi);
         }
 
         public override string ToString()

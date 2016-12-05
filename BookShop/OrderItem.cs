@@ -18,7 +18,7 @@ namespace edu.ksu.cis.masaaki
             _book = book;
         }
 
-        public override string ToString()
+        public string ToTransactionString()
         {
             return (_book.Title + "(" + _numBooks + ")");
         }
@@ -31,6 +31,28 @@ namespace edu.ksu.cis.masaaki
                 return true;
             }
             else return false;
+        }
+
+        public override string ToString()
+        {
+            return _book.ToWishListString() + " : " + _numBooks + " " + GetCost().ToString("C");
+        }
+
+        public decimal GetCost()
+        {
+            return _book.Price * _numBooks;
+        }
+
+        /// <summary>
+        /// Returns true if there is more books left.
+        /// Returns false if there is no more books left.
+        /// </summary>
+        /// <returns</returns>
+        public bool ReturnBook()
+        {
+            _numBooks--;
+            if (_numBooks <= 0) return false;
+            else return true;
         }
     }
 }

@@ -41,9 +41,9 @@ namespace edu.ksu.cis.masaaki
             return (_title + "  " + _author + "  " + _publisher + "  " + _isbn + "  " + _price.ToString("F") + "  " + _stock);
         }
 
-        public string ToCartString()
+        public string ToWishListString()
         {
-            return (_title + " BY " + _author + " : " + _stock + "      " + _price.ToString("C"));
+            return (_title + " BY " +  _author);
         }
 
         public bool TryGetBook()
@@ -63,6 +63,7 @@ namespace edu.ksu.cis.masaaki
         {
             _stock += numToAdd;
         }
+
 
         public bool ISBNMatch(string isbn)
         {
