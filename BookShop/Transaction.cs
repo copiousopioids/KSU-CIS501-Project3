@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 
 namespace edu.ksu.cis.masaaki
 {
+    [Serializable]
     public class Transaction
     {
         private Customer _attachedCust;
+        public Customer Customer { get { return _attachedCust; } }
         private List<OrderItem> _bookList;
         public List<OrderItem> BookList { get { return _bookList; } }
 
@@ -25,8 +27,9 @@ namespace edu.ksu.cis.masaaki
 
             foreach (OrderItem oi in _bookList)
             {
+                sb.Append(_attachedCust.UserName + ": ");
                 sb.Append(oi.ToTransactionString());
-                sb.Append(",   ");
+                sb.Append(",  ");
             }
 
             return sb.ToString();

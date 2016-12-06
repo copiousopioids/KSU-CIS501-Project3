@@ -6,16 +6,23 @@ using System.Threading.Tasks;
 
 namespace edu.ksu.cis.masaaki
 {
+    [Serializable]
     public class Customer
     {
         private string _firstName;
+        public string FirstName { get { return _firstName; } }
         private string _lastName;
+        public string LastName { get { return _lastName; } }
         private string _userName;
         public string UserName { get { return _userName; } }
         private string _password;
+        public string Password { get { return _password; } }
         private string _email;
+        public string Email { get { return _email; } }
         private string _address;
+        public string Address { get { return _address; } }
         private string _teleNum;
+        public string Telephone { get { return _teleNum; } }
 
         private Transaction _cart;
         public Transaction Cart { get { return _cart; } }
@@ -58,19 +65,12 @@ namespace edu.ksu.cis.masaaki
 
         public void EditInfo(string fn, string ln, string un, string pw, string email, string add, string tn)
         {
-            if (fn != null)
-                _firstName = fn;
-            if (ln != null)
-                _lastName = ln;
-            if (un != null)
-                _userName = un;
-            if (pw != null)
-                _password = pw;
-            if (email != null)
-                _email = email;
-            if (add != null)
-                _address = add;
-
+            _firstName = fn;
+            _lastName = ln;
+            _userName = un;
+            _password = pw;
+            _email = email;
+            _address = add;
             _teleNum = tn;
         }
 
@@ -113,9 +113,9 @@ namespace edu.ksu.cis.masaaki
                 _wishList.Remove(wli);
         }
 
-        public void ReturnFromCart(OrderItem oi)
+        public void ReturnFromTransaction(Transaction t, OrderItem oi)
         {
-            _cart.ReturnBook(oi);
+            t.ReturnBook(oi);
         }
 
         public override string ToString()

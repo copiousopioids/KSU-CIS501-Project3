@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace edu.ksu.cis.masaaki
 {
+    [Serializable]
     public class Book
     {
         private string _isbn;
@@ -70,6 +71,20 @@ namespace edu.ksu.cis.masaaki
             if (isbn == _isbn)
                 return true;
             else return false;
+        }
+
+        public void EditBook(string title, string author, string publisher, string isbn, string date, decimal price, int stock)
+        {
+            if (stock < 0) throw new BookShopException("Stock can't be less than 0");
+            if (price < 0) throw new BookShopException("Price can't be less than 0");
+
+            _isbn = isbn;
+            _title = title;
+            _author = author;
+            _stock = stock;
+            _publisher = publisher;
+            _price = price;
+            _date = date;
         }
     }
 }

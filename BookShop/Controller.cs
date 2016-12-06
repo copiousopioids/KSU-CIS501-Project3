@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace edu.ksu.cis.masaaki
 {
@@ -14,8 +16,10 @@ namespace edu.ksu.cis.masaaki
         public Customer CurrentCustomer { get { return _currentCustomer; } set { _currentCustomer = value; } }
         private List<Book> _books;
         public List<Book> BookList { get { return _books;  } set { _books = value; } }
-        public List<Transaction> _completeOrders;
-        public List<Transaction> _pendingOrders;
+        private List<Transaction> _completeOrders;
+        public List<Transaction> CompleteOrders { get { return _completeOrders; } }
+        private List<Transaction> _pendingOrders;
+        public List<Transaction> PendingOrders { get { return _pendingOrders; } }
 
         
 
@@ -82,9 +86,9 @@ namespace edu.ksu.cis.masaaki
         }
         
         // ZTM: Possibly just access directly through the CustomerWindow class instead of passing through like this...
-        public void EditCurrentCustomer(string fn, string ln, string un, string pw, string email, string add, string tn)
+        public void EditCustomer(Customer c, string fn, string ln, string un, string pw, string email, string add, string tn)
         {
-            _currentCustomer.EditInfo(fn, ln, un, pw, email, add, tn);
+            c.EditInfo(fn, ln, un, pw, email, add, tn);
         }
         
 
@@ -99,6 +103,20 @@ namespace edu.ksu.cis.masaaki
                 }
             }
         }
+
+        public void AddBook(string title, string author, string publisher, string isbn, string date, decimal price, int stock)
+        {
+            foreach (Book b in _books)
+            {
+                if (b.ISBN == isbn)
+                {
+                    throw new BookShopException("That ISBN has already been registered.");
+                }
+            }
+            _books.Add(new Book(title, author, publisher, isbn, date, price, stock));
+        }
+
+        
 
         public void AddBookToCartByISBN(string isbn)
         {
@@ -129,17 +147,7 @@ namespace edu.ksu.cis.masaaki
         public void LogOutCustomer()
         {
             _currentCustomer = null;
-        }
-
-        public void PopulateBookDialog(Book b, BookDialog bd)
-        {
-            bd.BookTitle = b.Title;
-            bd.Author = b.Author;
-            bd.Publisher = b.Publisher;
-            bd.ISBN = b.ISBN;   
-            bd.Date = b.Date;
-            bd.Price = b.Price;
-            bd.Stock = b.Stock;
+            
         }
 
         public void AddToPendingTransactions(Transaction t)
@@ -156,9 +164,55 @@ namespace edu.ksu.cis.masaaki
             }
         }
         
-        public void ReturnBook(OrderItem oi)
+        public void ReturnBook(Customer c, Transaction t, OrderItem oi)
         {
-            _currentCustomer.ReturnFromCart(oi);
-        }        
+            c.ReturnFromTransaction(t, oi);
+        }
+
+        public void SaveState(string filename)
+        {
+            BinaryFormatter fo = new BinaryFormatter();
+            using (FileStream f = new FileStream(filename, FileMode.Create))
+            {
+                Tuple<List<Customer>, List<Book>, List<Transaction>, List<Transaction>> tuple = new Tuple<List<Customer>, List<Book>, List<Transaction>, List<Transaction>>(_customers, _books, _pendingOrders, _completeOrders);
+                fo.Serialize(f, tuple);
+            }
+
+        } 
+        
+        public void RestoreState(string filename)
+        {
+            BinaryFormatter fo = new BinaryFormatter();
+            using (FileStream f = new FileStream(filename, FileMode.OpenOrCreate, FileAccess.Read))
+            {
+                Tuple<List<Customer>, List<Book>, List<Transaction>, List<Transaction>> tuple = (Tuple<List<Customer>, List<Book>, List<Transaction>, List<Transaction>>) new BinaryFormatter().Deserialize(f);
+                _customers = tuple.Item1;
+                _books = tuple.Item2;
+                _pendingOrders = tuple.Item3;
+                _completeOrders = tuple.Item4;
+            }
+        }
+
+        public void PopulateCustomerDialog(Customer c, CustomerDialog cd)
+        {
+            cd.FirstName = c.FirstName;
+            cd.LastName = c.LastName;
+            cd.UserName = c.UserName;
+            cd.Password = c.Password;
+            cd.EMailAddress = c.Email;
+            cd.Address = c.Address;
+            cd.TelephoneNumber = c.Telephone;
+        }
+
+        public void PopulateBookDialog(Book b, BookDialog bd)
+        {
+            bd.BookTitle = b.Title;
+            bd.Author = b.Author;
+            bd.Publisher = b.Publisher;
+            bd.ISBN = b.ISBN;
+            bd.Date = b.Date;
+            bd.Price = b.Price;
+            bd.Stock = b.Stock;
+        }
     }
 }

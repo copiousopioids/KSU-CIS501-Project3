@@ -65,11 +65,11 @@ namespace edu.ksu.cis.masaaki
                     listCustomersDialog.AddDisplayItems(_attachedControl.CustomerList.ToArray()); // null is a dummy argument
                     if (listCustomersDialog.Display() == DialogReturn.Done) return;
                     // select button is pressed
-                   
-
+                    Customer selectedCustomer = (Customer)listCustomersDialog.SelectedItem;
+                    _attachedControl.PopulateCustomerDialog(selectedCustomer, customerDialog);
                     if (customerDialog.Display() == DialogReturn.Cancel) continue;
                     // XXX Edit Done button is pressed
-                    
+                    _attachedControl.EditCustomer(selectedCustomer, customerDialog.FirstName, customerDialog.LastName, customerDialog.UserName, customerDialog.Password, customerDialog.EMailAddress, customerDialog.Address, customerDialog.TelephoneNumber);
                 }
                 catch (BookShopException bsex)
                 {
@@ -90,7 +90,7 @@ namespace edu.ksu.cis.masaaki
                     bookDialog.ClearDisplayItems();
                     if (bookDialog.ShowDialog() == DialogResult.Cancel) return;
                     // Edit Done button is pressed
-
+                    _attachedControl.AddBook(bookDialog.BookTitle, bookDialog.Author, bookDialog.Publisher, bookDialog.ISBN, bookDialog.Date, bookDialog.Price, bookDialog.Stock);
                     return;
                 }
                 catch (BookShopException bsex)
@@ -114,15 +114,16 @@ namespace edu.ksu.cis.masaaki
                     listBooksDialog.AddDisplayItems(_attachedControl.BookList.ToArray()); //null is a dummy argument
                     if (listBooksDialog.Display() == DialogReturn.Done) return;
                     // select is pressed
-
+                    Book selectedBook = (Book)listBooksDialog.SelectedItem;
+                    _attachedControl.PopulateBookDialog(selectedBook, bookDialog);
                     while (true)
                     {
   
                         try
                         { // to capture an exception from Price/Stock of bookDialog
                             if (bookDialog.Display() == DialogReturn.Cancel) break;
-                            // XXX
-
+                            // XXX Edit Done is Pressed
+                            selectedBook.EditBook(bookDialog.BookTitle, bookDialog.Author, bookDialog.Publisher, bookDialog.ISBN, bookDialog.Date, bookDialog.Price, bookDialog.Stock);
                             break;
                         }
                         catch (BookShopException bsex)
@@ -149,28 +150,37 @@ namespace edu.ksu.cis.masaaki
                 try
                 {  // to capture an exception from SelectedIndex/SelectedItem of listPendingTransactionsDialog
                     listPendingTransactionsDialog.ClearDisplayItems();
-                    listPendingTransactionsDialog.AddDisplayItems(null);  // null is a dummy argument
+                    listPendingTransactionsDialog.AddDisplayItems(_attachedControl.PendingOrders.ToArray());  // null is a dummy argument
                     if (listPendingTransactionsDialog.Display() == DialogReturn.Done) return;
                     // select button is pressed
-              
+                    Transaction selectedTransaction = (Transaction)listPendingTransactionsDialog.SelectedItem;
                     while (true)
                     {
                         try
                         {  // to capture an exception from SelectedItem/SelectedTransaction of showPendingTransactionDialog
                             showPendingTransactionDialog.ClearDisplayItems();
-                            showPendingTransactionDialog.AddDisplayItems(null); // null is a dummy argument
+                            showPendingTransactionDialog.AddDisplayItems(selectedTransaction.BookList.ToArray()); // null is a dummy argument
+                            showPendingTransactionDialog.AddDisplayItems(selectedTransaction.CartTotalArray());
                             switch (showPendingTransactionDialog.Display())
                             {
                                 case DialogReturn.Approve:  // Transaction Processed
                                     // XXX
+                                    _attachedControl.ProcessPendingTransaction(listPendingTransactionsDialog.SelectedIndex);
                                     break;
                                 case DialogReturn.ReturnBook: // Return Book
                                     // XXX
-                                        
+                                    object selectedObject = showPendingTransactionDialog.SelectedItem;  // picked up a string or an OrderItem object
+                                    if (!(selectedObject is OrderItem))
+                                    {
+                                        MessageBox.Show(this, "an extra line was selected");
+                                        continue;
+                                    }
+                                    OrderItem targetObject = (OrderItem)selectedObject;
+                                    _attachedControl.ReturnBook(selectedTransaction.Customer, selectedTransaction, targetObject);
                                     continue;
                                 case DialogReturn.Remove: // Remove transaction
-                                    // XXX
-
+                                                          // XXX
+                                    _attachedControl.PendingOrders.Remove(selectedTransaction);
                                     break;
                             }
                             break; //for "transaction processed"
@@ -199,17 +209,18 @@ namespace edu.ksu.cis.masaaki
                 try
                 { // to capture an exception from SelectedItem/SelectedIndex of listCompleteTransactionsDialog
                     listCompleteTransactionsDialog.ClearDisplayItems();
-                    listCompleteTransactionsDialog.AddDisplayItems(null); // XXX null is a dummy argument
+                    listCompleteTransactionsDialog.AddDisplayItems(_attachedControl.CompleteOrders.ToArray()); // XXX null is a dummy argument
                     if (listCompleteTransactionsDialog.Display() == DialogReturn.Done) return;
                     // select button is pressed
-                    
+                    Transaction selectedTransaction = (Transaction)listCompleteTransactionsDialog.SelectedItem;
                     showCompleteTransactionDialog.ClearDisplayItems();
-                    showCompleteTransactionDialog.AddDisplayItems(null); // XXX null is a dummy argument
+                    showCompleteTransactionDialog.AddDisplayItems(selectedTransaction.BookList.ToArray()); // XXX null is a dummy argument
+                    showCompleteTransactionDialog.AddDisplayItems(selectedTransaction.CartTotalArray());
                     switch (showCompleteTransactionDialog.Display())
                     {
                         case DialogReturn.Remove: // transaction Remove
                             // XXX
-
+                            _attachedControl.CompleteOrders.Remove(selectedTransaction);
                             continue;
                         case DialogReturn.Done:
                             continue;
@@ -235,10 +246,11 @@ namespace edu.ksu.cis.masaaki
                 saveFileDialog.InitialDirectory = Application.StartupPath;
                 if (saveFileDialog.ShowDialog() != DialogResult.OK) return;
                 // XXX
+                _attachedControl.SaveState(saveFileDialog.FileName);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                MessageBox.Show("Serialization Failed");
+                MessageBox.Show("Serialization Failed" + ex.ToString());
             }
         }
 
@@ -252,11 +264,12 @@ namespace edu.ksu.cis.masaaki
                 openFileDialog.InitialDirectory = Application.StartupPath;
                 if (openFileDialog.ShowDialog() != DialogResult.OK) return;
                 // XXX
+                _attachedControl.RestoreState(openFileDialog.FileName);
             }
- 
-            catch (Exception)
+
+            catch (Exception ex)
             {
-                MessageBox.Show("Serialization Failed");
+                MessageBox.Show("Serialization Failed" + ex.ToString());
             }
         }
 
@@ -264,5 +277,7 @@ namespace edu.ksu.cis.masaaki
         {
             Application.Exit();
         }
+
+
     }
 }

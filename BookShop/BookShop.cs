@@ -99,12 +99,12 @@ namespace edu.ksu.cis.masaaki
                                     decimal price = getDecimal(words[5]);
                                     int stock = getInt(words[7]);
                                     // XXX use words[1]~words[4], price, words[6], and stock to register a book
-                                    _control.BookList.Add(new Book(words[1], words[2], words[3], words[4], words[6], price, stock));
+                                    _control.AddBook(words[1], words[2], words[3], words[4], words[6], price, stock);
 
                                     break;
                                 case "AddCustomer":
                                     // XXX use words[1]~words[7] to register a customer
-                                    _control.CustomerList.Add(new Customer(words[2], words[1], words[3], words[4], words[5], words[6], words[7]));
+                                    _control.RegisterCustomer(words[2], words[1], words[3], words[4], words[5], words[6], words[7]);
 
                                     break;
                                 case "Login":

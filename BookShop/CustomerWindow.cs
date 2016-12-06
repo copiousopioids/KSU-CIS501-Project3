@@ -142,7 +142,7 @@ namespace edu.ksu.cis.masaaki
                         case DialogReturn.Cancel:
                             return;
                         case DialogReturn.Done:
-                            _attachedControl.EditCurrentCustomer(customerDialog.FirstName, customerDialog.LastName, customerDialog.UserName, customerDialog.Password, customerDialog.EMailAddress, customerDialog.Address, customerDialog.TelephoneNumber);
+                            _attachedControl.EditCustomer(_attachedControl.CurrentCustomer, customerDialog.FirstName, customerDialog.LastName, customerDialog.UserName, customerDialog.Password, customerDialog.EMailAddress, customerDialog.Address, customerDialog.TelephoneNumber);
                             break;
                         default:
                             return;
@@ -205,15 +205,18 @@ namespace edu.ksu.cis.masaaki
         private void bnShowWishlist_Click(object sender, EventArgs e)
         {
             // XXX Show WishList Button event handler
-          
+
+            if (!_attachedControl.IsLoggedIn())
+            {
+               MessageBox.Show("Customer not logged in.");
+                return;
+            }
+
             while (true)
             {
                 try
                 { // to capture an excepton by SelectedItem/SelectedIndex of wishListDialog
-                    if (!_attachedControl.IsLoggedIn())
-                    {
-                        throw new BookShopException("Customer not logged in.");
-                    }
+
 
                     wishListDialog.ClearDisplayItems();
                     wishListDialog.AddDisplayItems(_attachedControl.CurrentCustomer.WishList.ToArray());  // XXX null is a dummy argument
@@ -248,7 +251,14 @@ namespace edu.ksu.cis.masaaki
 
         private void bnShowCart_Click(object sender, EventArgs e)
         {
-           // XXX Show Cart Button event handler
+            // XXX Show Cart Button event handler
+
+            if (!_attachedControl.IsLoggedIn())
+            {
+                MessageBox.Show("Customer not logged in.");
+                return;
+            }
+
             while (true)
             {
                 try
@@ -280,7 +290,7 @@ namespace edu.ksu.cis.masaaki
                                 continue;
                             }
                             OrderItem targetObject = (OrderItem)selectedObject;
-                            _attachedControl.ReturnBook(targetObject);
+                            _attachedControl.ReturnBook(_attachedControl.CurrentCustomer, _attachedControl.CurrentCustomer.Cart, targetObject);
                             continue;
                         
                         case DialogReturn.Done: // cancel
@@ -310,10 +320,11 @@ namespace edu.ksu.cis.masaaki
                         listTransactionHistoryDialog.AddDisplayItems(_attachedControl.CurrentCustomer.OrderHistory.ToArray()); // null is a dummy argument
                         if (listTransactionHistoryDialog.Display() == DialogReturn.Done) return;
                         // Select is pressed
-                        Transaction selectedTransaction = 
+                        Transaction selectedTransaction = (Transaction)listTransactionHistoryDialog.SelectedItem;
 
                         showTransactionDialog.ClearDisplayItems();
-                        showTransactionDialog.AddDisplayItems(null); // null is a dummy argument
+                        showTransactionDialog.AddDisplayItems(selectedTransaction.BookList.ToArray()); // null is a dummy argument
+                        showTransactionDialog.AddDisplayItems(selectedTransaction.CartTotalArray());
                         showTransactionDialog.ShowDialog();
                     }
                     else throw new BookShopException("Customer not logged in.");
@@ -328,7 +339,13 @@ namespace edu.ksu.cis.masaaki
         private void bnLogout_Click(object sender, EventArgs e)
         {
             // XXX Logout  button event handler
+            if (!_attachedControl.IsLoggedIn())
+            {
+                MessageBox.Show("Customer not logged in.");
+                return;
+            }
             _attachedControl.LogOutCustomer();
+            UpdateCustomerText();
         }
 
         public void UpdateCustomerText()
@@ -338,7 +355,5 @@ namespace edu.ksu.cis.masaaki
             else
                 lbLoggedinCustomer.Text = ("Loggedin Customer: (none)");
         }
-
-
     }
 }
